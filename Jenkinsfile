@@ -105,12 +105,7 @@ pipeline {
         }
 
         failure {
-            sh """
-                docker compose \
-                    -p ${env.COMPOSE_PROJECT} \
-                    -f ${env.WORKSPACE}/${env.COMPOSE_FILE} \
-                    down --volumes --remove-orphans || true
-            """
+            echo "Pipeline FAILED — Build #${env.BUILD_NUMBER}"
         }
 
         unstable {
@@ -118,6 +113,12 @@ pipeline {
         }
 
         always {
+            sh """
+                docker compose \
+                    -p ${env.COMPOSE_PROJECT} \
+                    -f ${env.WORKSPACE}/${env.COMPOSE_FILE} \
+                    down --volumes --remove-orphans || true
+            """
             deleteDir()
         }
     }
