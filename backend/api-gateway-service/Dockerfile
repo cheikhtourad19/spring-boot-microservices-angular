@@ -2,6 +2,9 @@ FROM maven:3.8.5-openjdk-11-slim AS builder
 
 WORKDIR /build
 
+COPY pom.xml ./pom.xml
+RUN mvn install -N -DskipTests -q
+
 COPY api-gateway-service ./api-gateway-service
 RUN cd /build/api-gateway-service && mvn package -DskipTests -q
 
