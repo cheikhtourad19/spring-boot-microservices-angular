@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <!-- Inherit defaults from Spring Boot -->
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>2.6.7</version>
+        <relativePath/>
+    </parent>
+
+    <groupId>com.microservices</groupId>
+    <artifactId>microservices-parent</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+    <packaging>pom</packaging>
+    <name>microservices-parent</name>
+    <description>Parent POM for Spring Boot Microservices</description>
+
+    <!-- ===== Submodules ===== -->
+    <modules>
+        <module>common-service</module>
+        <module>common-exam</module>
+        <module>common-student</module>
+        <module>answer-service</module>
+        <module>course-service</module>
+        <module>exam-service</module>
+        <module>user-service</module>
+        <module>eureka-service</module>
+        <module>api-gateway-service</module>
+        <module>zuul-service</module>
+    </modules>
+
+    <!-- ===== Shared Properties ===== -->
+    <properties>
+        <java.version>11</java.version>
+        <spring-cloud.version>2021.0.1</spring-cloud.version>
+        <sonar.maven.plugin.version>3.11.0.3922</sonar.maven.plugin.version>
+
+        <!-- ─── SonarQube connection ─── -->
+        <!-- Override these via -D flags, CI env vars, or ~/.m2/settings.xml  -->
+        <sonar.host.url>http://localhost:9000</sonar.host.url>
+        <!-- Use a SonarQube user token (preferred over username/password)    -->
+        <sonar.token>REPLACE_WITH_YOUR_SONAR_TOKEN</sonar.token>
+        <!-- Fallback basic-auth credentials (used if sonar.token is not set) -->
+        <sonar.login>admin</sonar.login>
+        <sonar.password>REPLACE_WITH_YOUR_SONAR_PASSWORD</sonar.password>
+
+        <!-- ─── SonarQube project metadata ─── -->
+        <sonar.projectKey>spring-boot-microservices</sonar.projectKey>
+        <sonar.projectName>Spring Boot Microservices</sonar.projectName>
+        <sonar.projectVersion>${project.version}</sonar.projectVersion>
+        <sonar.organization>REPLACE_WITH_YOUR_SONAR_ORGANIZATION</sonar.organization>
+        <sonar.language>java</sonar.language>
+        <sonar.sourceEncoding>UTF-8</sonar.sourceEncoding>
+        <sonar.sources>src/main/java</sonar.sources>
+        <sonar.tests>src/test/java</sonar.tests>
+        <sonar.java.coveragePlugin>jacoco</sonar.java.coveragePlugin>
+        <sonar.coverage.jacoco.xmlReportPaths>
+            ${project.build.directory}/site/jacoco/jacoco.xml
+        </sonar.coverage.jacoco.xmlReportPaths>
+    </properties>
+
+    <!-- ===== Shared Dependency Versions ===== -->
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-dependencies</artifactId>
+                <version>${spring-cloud.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+    <!-- ===== Build: plugins available to all children ===== -->
+    <build>
+        <pluginManagement>
+            <plugins>
+                <!-- SonarQube scanner -->
+                <plugin>
+                    <groupId>org.sonarsource.scanner.maven</groupId>
+                    <artifactId>sonar-maven-plugin</artifactId>
+                    <version>${sonar.maven.plugin.version}</version>
+                </plugin>
+
+                <!-- JaCoCo – code coverage reports consumed by SonarQube -->
+                <plugin>
+                    <groupId>org.jacoco</groupId>
+                    <artifactId>jacoco-maven-plugin</artifactId>
+                    <version>0.8.11</version>
+                    <executions>
+                        <execution>
+                            <id>prepare-agent</id>
+                            <goals>
+                                <goal>prepare-agent</goal>
+                            </goals>
+                        </execution>
+                        <execution>
+                            <id>report</id>
+                            <phase>verify</phase>
+                            <goals>
+                                <goal>report</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+
+        <!-- Activate JaCoCo + SonarQube scanner for every child module automatically -->
+        <plugins>
+            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.sonarsource.scanner.maven</groupId>
+                <artifactId>sonar-maven-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
+
+    <!-- ===== SonarQube profile ===== -->
+    <!-- Run analysis with:  mvn verify sonar:sonar -P sonar                 -->
+    <!-- Or pass credentials inline:                                          -->
+    <!--   mvn verify sonar:sonar -P sonar -Dsonar.token=<token>             -->
+    <profiles>
+        <profile>
+            <id>sonar</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.sonarsource.scanner.maven</groupId>
+                        <artifactId>sonar-maven-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>sonar-analysis</id>
+                                <phase>verify</phase>
+                                <goals>
+                                    <goal>sonar</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
+
+</project>

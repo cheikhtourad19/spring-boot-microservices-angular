@@ -1,0 +1,12 @@
+# Ignore target directories to avoid sending compiled artifacts in build context
+*/target/
+*/.mvn/
+# Ignore IDE files
+**/.idea/
+**/*.iml
+**/.classpath
+**/.project
+**/.settings/
+# Ignore git
+**/.git/
+**/.gitignore
