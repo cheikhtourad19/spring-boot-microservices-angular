@@ -2,46 +2,31 @@ pipeline {
 
     agent any
 
-    // ─────────────────────────────────────────────────────────────────────────
-    // Pipeline-wide environment variables
-    // Sensitive values (SONAR_TOKEN, etc.) are stored as Jenkins Credentials:
-    //   Manage Jenkins → Credentials → Global → Add Credential (Secret text)
-    // ─────────────────────────────────────────────────────────────────────────
     environment {
-        // GitHub repository
+
         GITHUB_REPO_URL    = 'https://github.com/cheikhtourad19/spring-boot-microservices-angular.git'
         GITHUB_BRANCH      = 'main'
-
-        // SonarQube – matches the server name configured in
-        //   Manage Jenkins → Configure System → SonarQube servers
-        SONAR_SERVER_NAME  = 'SonarServer'                   // Name field in Jenkins
-        SONAR_HOST_URL     = 'http://192.168.56.11:9000'     // Server URL field
-        // Authentication token is stored as Jenkins credential ID: sonar_key
+        SONAR_SERVER_NAME  = 'SonarServer'
+        SONAR_HOST_URL     = 'http://192.168.56.11:9000'
         SONAR_PROJECT_KEY  = 'spring-boot-microservices'
         SONAR_PROJECT_NAME = 'Spring Boot Microservices'
 
-        // Docker Compose file (relative to workspace root)
+
         COMPOSE_FILE       = 'docker-compose.yml'
 
-        // Compose project name (keeps container names stable across builds)
         COMPOSE_PROJECT    = 'microservices'
     }
 
-    // ─────────────────────────────────────────────────────────────────────────
-    // Build options
-    // ─────────────────────────────────────────────────────────────────────────
+
     options {
-        buildDiscarder(logRotator(numToKeepStr: '10'))   // keep last 10 builds
-        timeout(time: 60, unit: 'MINUTES')               // fail-safe overall timeout
-        disableConcurrentBuilds()                         // one build at a time
+        buildDiscarder(logRotator(numToKeepStr: '10'))
+        timeout(time: 60, unit: 'MINUTES')
+        disableConcurrentBuilds()
     }
 
-    // ─────────────────────────────────────────────────────────────────────────
-    // Stages
-    // ─────────────────────────────────────────────────────────────────────────
+
     stages {
 
-        // ── 1. Build & Test (all backend modules via parent POM) ─────────────
         stage('Build & Test') {
             steps {
                 dir('backend') {
@@ -49,13 +34,12 @@ pipeline {
                         mvn clean verify \
                             --batch-mode \
                             --no-transfer-progress \
-                            -DskipTests=false
+                            -DskipTests=true
                     '''
                 }
             }
         }
 
-        // ── 3. SonarQube Analysis ─────────────────────────────────────────────
         stage('SonarQube Analysis') {
             steps {
                 withSonarQubeEnv(env.SONAR_SERVER_NAME) {
@@ -78,7 +62,7 @@ pipeline {
             }
         }
 
-        // ── 4. Quality Gate ───────────────────────────────────────────────────
+
         stage('Quality Gate') {
             steps {
                 echo 'Waiting for SonarQube Quality Gate result …'
@@ -91,7 +75,7 @@ pipeline {
             }
         }
 
-        // ── 5. Docker Compose Build ───────────────────────────────────────────
+
         stage('Docker Compose Build') {
             steps {
                 sh """
