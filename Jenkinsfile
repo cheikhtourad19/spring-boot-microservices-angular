@@ -11,21 +11,34 @@ pipeline {
         SONAR_PROJECT_KEY  = 'spring-boot-microservices'
         SONAR_PROJECT_NAME = 'Spring Boot Microservices'
 
-
         COMPOSE_FILE       = 'docker-compose.yml'
-
         COMPOSE_PROJECT    = 'microservices'
     }
-
 
     options {
         buildDiscarder(logRotator(numToKeepStr: '10'))
         timeout(time: 60, unit: 'MINUTES')
         disableConcurrentBuilds()
+        skipDefaultCheckout()
     }
 
-
     stages {
+
+        stage('Checkout') {
+            steps {
+                sh '''
+                    if [ -d ".git" ]; then
+                        echo "Repo exists — pulling latest changes..."
+                        git fetch origin
+                        git reset --hard origin/main
+                        git clean -fd
+                    else
+                        echo "First run — cloning repository..."
+                        git clone -b main ''' + env.GITHUB_REPO_URL + ''' .
+                    fi
+                '''
+            }
+        }
 
         stage('Build & Test') {
             steps {
@@ -119,7 +132,6 @@ pipeline {
                     -f ${env.WORKSPACE}/${env.COMPOSE_FILE} \
                     down --volumes --remove-orphans || true
             """
-            deleteDir()
         }
     }
 }
