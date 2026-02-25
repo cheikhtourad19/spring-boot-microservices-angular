@@ -78,7 +78,7 @@ services:
     container_name: eureka-service
     restart: unless-stopped
     ports:
-      - "8761:8761"
+      - "18761:8761"
     environment:
       - SPRING_APPLICATION_NAME=eureka-service
       - SERVER_PORT=8761
@@ -101,7 +101,7 @@ services:
     container_name: user-service
     restart: unless-stopped
     ports:
-      - "8080:8080"
+      - "18080:8080"
     environment:
       - SPRING_APPLICATION_NAME=user-service
       - SERVER_PORT=8080
@@ -130,7 +130,7 @@ services:
     container_name: course-service
     restart: unless-stopped
     ports:
-      - "8081:8081"
+      - "18081:8081"
     environment:
       - SPRING_APPLICATION_NAME=course-service
       - SERVER_PORT=8081
@@ -158,7 +158,7 @@ services:
     container_name: exam-service
     restart: unless-stopped
     ports:
-      - "8082:8082"
+      - "18082:8082"
     environment:
       - SPRING_APPLICATION_NAME=exam-service
       - SERVER_PORT=8082
@@ -186,7 +186,7 @@ services:
     container_name: answer-service
     restart: unless-stopped
     ports:
-      - "8083:8083"
+      - "18083:8083"
     environment:
       - SPRING_APPLICATION_NAME=answer-service
       - SERVER_PORT=8083
@@ -211,7 +211,7 @@ services:
     container_name: api-gateway
     restart: unless-stopped
     ports:
-      - "8090:8090"
+      - "18090:8090"
     environment:
       - SPRING_APPLICATION_NAME=api-gateway-service
       - SERVER_PORT=8090
@@ -260,7 +260,7 @@ services:
     container_name: zuul-service
     restart: unless-stopped
     ports:
-      - "8091:8090"
+      - "18091:8090"
     environment:
       - SPRING_APPLICATION_NAME=zuul-service
       - SERVER_PORT=8090
