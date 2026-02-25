@@ -57,20 +57,14 @@ pipeline {
         stage('SonarQube Analysis') {
             steps {
                 withSonarQubeEnv(env.SONAR_SERVER_NAME) {
-                    withCredentials([string(credentialsId: 'sonar_key', variable: 'SONAR_TOKEN')]) {
-                        dir('backend') {
-                            sh """
-                                mvn sonar:sonar \
-                                    --batch-mode \
-                                    --no-transfer-progress \
-                                    -Dsonar.host.url=${env.SONAR_HOST_URL} \
-                                    -Dsonar.token=${SONAR_TOKEN} \
-                                    -Dsonar.projectKey=${env.SONAR_PROJECT_KEY} \
-                                    -Dsonar.projectName='${env.SONAR_PROJECT_NAME}' \
-                                    -Dsonar.java.coveragePlugin=jacoco \
-                                    -Dsonar.coverage.jacoco.xmlReportPaths=target/site/jacoco/jacoco.xml
-                            """
-                        }
+                    dir('backend') {
+                        sh """
+                            mvn sonar:sonar \
+                                --batch-mode \
+                                --no-transfer-progress \
+                                -Dsonar.projectKey=${env.SONAR_PROJECT_KEY} \
+                                -Dsonar.projectName='${env.SONAR_PROJECT_NAME}'
+                        """
                     }
                 }
             }
