@@ -41,14 +41,7 @@ pipeline {
     // ─────────────────────────────────────────────────────────────────────────
     stages {
 
-        // ── 1. Checkout ───────────────────────────────────────────────────────
-        stage('Checkout') {
-            steps {
-                sh "git clone -b ${env.GITHUB_BRANCH} ${env.GITHUB_REPO_URL} ."
-            }
-        }
-
-        // ── 2. Build & Test (all backend modules via parent POM) ─────────────
+        // ── 1. Build & Test (all backend modules via parent POM) ─────────────
         stage('Build & Test') {
             steps {
                 dir('backend') {
@@ -148,7 +141,7 @@ pipeline {
         }
 
         always {
-            cleanWs()
+            deleteDir()
         }
     }
 }
