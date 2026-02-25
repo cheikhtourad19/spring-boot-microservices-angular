@@ -36,6 +36,8 @@
     <!-- ===== Shared Properties ===== -->
     <properties>
         <java.version>11</java.version>
+        <maven.compiler.release>11</maven.compiler.release>
+        <lombok.version>1.18.32</lombok.version>
         <spring-cloud.version>2021.0.1</spring-cloud.version>
         <sonar.maven.plugin.version>3.11.0.3922</sonar.maven.plugin.version>
 
@@ -73,6 +75,12 @@
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
+            <!-- Pin Lombok to a JDK 21-compatible version across all modules -->
+            <dependency>
+                <groupId>org.projectlombok</groupId>
+                <artifactId>lombok</artifactId>
+                <version>${lombok.version}</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
@@ -80,6 +88,23 @@
     <build>
         <pluginManagement>
             <plugins>
+                <!-- Upgraded compiler plugin – required for JDK 17/21 -->
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <version>3.13.0</version>
+                    <configuration>
+                        <release>11</release>
+                        <annotationProcessorPaths>
+                            <path>
+                                <groupId>org.projectlombok</groupId>
+                                <artifactId>lombok</artifactId>
+                                <version>${lombok.version}</version>
+                            </path>
+                        </annotationProcessorPaths>
+                    </configuration>
+                </plugin>
+
                 <!-- SonarQube scanner -->
                 <plugin>
                     <groupId>org.sonarsource.scanner.maven</groupId>

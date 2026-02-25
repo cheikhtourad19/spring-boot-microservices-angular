@@ -79,7 +79,7 @@ pipeline {
         stage('Docker Compose Build') {
             steps {
                 sh """
-                    docker-compose \
+                    docker compose \
                         -p ${env.COMPOSE_PROJECT} \
                         -f ${env.COMPOSE_FILE} \
                         build --no-cache --parallel
@@ -87,16 +87,15 @@ pipeline {
             }
         }
 
-        // ── 6. Docker Compose Up ──────────────────────────────────────────────
         stage('Docker Compose Up') {
             steps {
                 sh """
-                    docker-compose \
+                    docker compose \
                         -p ${env.COMPOSE_PROJECT} \
                         -f ${env.COMPOSE_FILE} \
                         up -d --remove-orphans
                 """
-                sh "docker-compose -p ${env.COMPOSE_PROJECT} -f ${env.COMPOSE_FILE} ps"
+                sh "docker compose -p ${env.COMPOSE_PROJECT} -f ${env.COMPOSE_FILE} ps"
             }
         }
 
@@ -113,7 +112,7 @@ pipeline {
 
         failure {
             sh """
-                docker-compose \
+                docker compose \
                     -p ${env.COMPOSE_PROJECT} \
                     -f ${env.COMPOSE_FILE} \
                     down --volumes --remove-orphans || true
