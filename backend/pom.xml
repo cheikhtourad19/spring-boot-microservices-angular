@@ -44,11 +44,8 @@
         <!-- ─── SonarQube connection ─── -->
         <!-- Override these via -D flags, CI env vars, or ~/.m2/settings.xml  -->
         <sonar.host.url>http://localhost:9000</sonar.host.url>
-        <!-- Use a SonarQube user token (preferred over username/password)    -->
-        <sonar.token>REPLACE_WITH_YOUR_SONAR_TOKEN</sonar.token>
-        <!-- Fallback basic-auth credentials (used if sonar.token is not set) -->
-        <sonar.login>admin</sonar.login>
-        <sonar.password>REPLACE_WITH_YOUR_SONAR_PASSWORD</sonar.password>
+        <!-- Token is injected at runtime by Jenkins via -Dsonar.token       -->
+        <!-- Do NOT hardcode the token here                                  -->
 
         <!-- ─── SonarQube project metadata ─── -->
         <sonar.projectKey>spring-boot-microservices</sonar.projectKey>
