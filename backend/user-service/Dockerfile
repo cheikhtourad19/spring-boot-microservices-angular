@@ -2,6 +2,9 @@ FROM maven:3.8.5-openjdk-11-slim AS builder
 
 WORKDIR /build
 
+COPY pom.xml ./pom.xml
+RUN mvn install -N -DskipTests -q
+
 COPY common-service ./common-service
 COPY common-student ./common-student
 
