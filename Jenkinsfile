@@ -32,7 +32,6 @@ pipeline {
     // ─────────────────────────────────────────────────────────────────────────
     options {
         buildDiscarder(logRotator(numToKeepStr: '10'))   // keep last 10 builds
-        timestamps()                                      // prefix logs with time
         timeout(time: 60, unit: 'MINUTES')               // fail-safe overall timeout
         disableConcurrentBuilds()                         // one build at a time
     }
