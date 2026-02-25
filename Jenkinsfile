@@ -81,7 +81,7 @@ pipeline {
                 sh """
                     docker compose \
                         -p ${env.COMPOSE_PROJECT} \
-                        -f ${env.COMPOSE_FILE} \
+                        -f ${env.WORKSPACE}/${env.COMPOSE_FILE} \
                         build --no-cache --parallel
                 """
             }
@@ -92,10 +92,10 @@ pipeline {
                 sh """
                     docker compose \
                         -p ${env.COMPOSE_PROJECT} \
-                        -f ${env.COMPOSE_FILE} \
+                        -f ${env.WORKSPACE}/${env.COMPOSE_FILE} \
                         up -d --remove-orphans
                 """
-                sh "docker compose -p ${env.COMPOSE_PROJECT} -f ${env.COMPOSE_FILE} ps"
+                sh "docker compose -p ${env.COMPOSE_PROJECT} -f ${env.WORKSPACE}/${env.COMPOSE_FILE} ps"
             }
         }
 
@@ -114,7 +114,7 @@ pipeline {
             sh """
                 docker compose \
                     -p ${env.COMPOSE_PROJECT} \
-                    -f ${env.COMPOSE_FILE} \
+                    -f ${env.WORKSPACE}/${env.COMPOSE_FILE} \
                     down --volumes --remove-orphans || true
             """
         }
