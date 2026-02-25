@@ -26,17 +26,18 @@ pipeline {
 
         stage('Checkout') {
             steps {
-                sh '''
+                sh """
                     if [ -d ".git" ]; then
                         echo "Repo exists — pulling latest changes..."
+                        git remote set-url origin ${env.GITHUB_REPO_URL} 2>/dev/null || git remote add origin ${env.GITHUB_REPO_URL}
                         git fetch origin
                         git reset --hard origin/main
                         git clean -fd
                     else
                         echo "First run — cloning repository..."
-                        git clone -b main ''' + env.GITHUB_REPO_URL + ''' .
+                        git clone -b main ${env.GITHUB_REPO_URL} .
                     fi
-                '''
+                """
             }
         }
 
