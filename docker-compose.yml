@@ -132,9 +132,9 @@ services:
       - MANAGEMENT_METRICS_TAGS_APPLICATION=user-service
     depends_on:
       postgres:
-        condition: service_healthy
+        condition: service_started
       eureka-service:
-        condition: service_healthy
+        condition: service_started
     networks:
       - microservices-net
 
@@ -165,9 +165,9 @@ services:
       - MANAGEMENT_METRICS_TAGS_APPLICATION=course-service
     depends_on:
       mysql:
-        condition: service_healthy
+        condition: service_started
       eureka-service:
-        condition: service_healthy
+        condition: service_started
     networks:
       - microservices-net
 
@@ -198,9 +198,9 @@ services:
       - MANAGEMENT_METRICS_TAGS_APPLICATION=exam-service
     depends_on:
       mysql:
-        condition: service_healthy
+        condition: service_started
       eureka-service:
-        condition: service_healthy
+        condition: service_started
     networks:
       - microservices-net
 
@@ -228,9 +228,9 @@ services:
       - MANAGEMENT_METRICS_TAGS_APPLICATION=answer-service
     depends_on:
       mongodb:
-        condition: service_healthy
+        condition: service_started
       eureka-service:
-        condition: service_healthy
+        condition: service_started
     networks:
       - microservices-net
   api-gateway:
