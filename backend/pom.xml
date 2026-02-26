@@ -24,13 +24,11 @@
         <module>common-service</module>
         <module>common-exam</module>
         <module>common-student</module>
-        <module>answer-service</module>
         <module>course-service</module>
         <module>exam-service</module>
         <module>user-service</module>
         <module>eureka-service</module>
         <module>api-gateway-service</module>
-        <module>zuul-service</module>
     </modules>
 
     <!-- ===== Shared Properties ===== -->

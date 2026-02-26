@@ -33,10 +33,6 @@ scrape_configs:
     static_configs:
       - targets: ['192.168.56.11:18082']
 
-  - job_name: 'answer-service'
-    metrics_path: '/actuator/prometheus'
-    static_configs:
-      - targets: ['192.168.56.11:18083']
 
   - job_name: 'api-gateway-service'
     metrics_path: '/actuator/prometheus'

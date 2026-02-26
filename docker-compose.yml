@@ -5,7 +5,6 @@ networks:
 volumes:
   postgres-data:
   mysql-data:
-  mongo-data:
 
 
 services:
@@ -53,28 +52,6 @@ services:
       timeout: 5s
       retries: 10
 
-  mongodb:
-    image: mongo:6.0
-    container_name: mongodb
-    restart: unless-stopped
-    mem_limit: 256m
-    command: ["mongod", "--wiredTigerCacheSizeGB", "0.1"]
-    environment:
-      MONGO_INITDB_ROOT_USERNAME: mongodb
-      MONGO_INITDB_ROOT_PASSWORD: mongodb
-      MONGO_INITDB_DATABASE: microservices_answers_db
-    ports:
-      - "27017:27017"
-    volumes:
-      - mongo-data:/data/db
-    networks:
-      - microservices-net
-    healthcheck:
-      test: ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping')", "--username", "mongodb", "--password", "mongodb", "--authenticationDatabase", "admin"]
-      interval: 15s
-      timeout: 10s
-      retries: 10
-      start_period: 40s
 
 
   eureka-service:
@@ -205,34 +182,6 @@ services:
       - microservices-net
 
 
-  answer-service:
-    build:
-      context: ./backend
-      dockerfile: answer-service/Dockerfile
-    container_name: answer-service
-    restart: unless-stopped
-    mem_limit: 256m
-    ports:
-      - "18083:8083"
-    environment:
-      - SPRING_APPLICATION_NAME=answer-service
-      - SERVER_PORT=8083
-      - JAVA_TOOL_OPTIONS=-Xms32m -Xmx128m
-      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-service:8761/eureka
-      - EUREKA_INSTANCE_PREFER_IP_ADDRESS=true
-      - SPRING_DATA_MONGODB_URI=mongodb://mongodb:mongodb@mongodb:27017/microservices_answers_db?authSource=admin
-      - SPRING_AUTOCONFIGURE_EXCLUDE=org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
-      - SPRING_CLOUD_LOADBALANCER_RIBBON_ENABLED=false
-      - MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE=health,info,prometheus,metrics
-      - MANAGEMENT_ENDPOINT_HEALTH_SHOW_DETAILS=always
-      - MANAGEMENT_METRICS_TAGS_APPLICATION=answer-service
-    depends_on:
-      mongodb:
-        condition: service_started
-      eureka-service:
-        condition: service_started
-    networks:
-      - microservices-net
   api-gateway:
     build:
       context: ./backend
@@ -259,9 +208,6 @@ services:
       - SPRING_CLOUD_GATEWAY_ROUTES[2]_ID=exams-core
       - SPRING_CLOUD_GATEWAY_ROUTES[2]_URI=lb://EXAM-SERVICE
       - SPRING_CLOUD_GATEWAY_ROUTES[2]_PREDICATES[0]=Path=/exams/**
-      - SPRING_CLOUD_GATEWAY_ROUTES[3]_ID=answer-core
-      - SPRING_CLOUD_GATEWAY_ROUTES[3]_URI=lb://ANSWER-SERVICE
-      - SPRING_CLOUD_GATEWAY_ROUTES[3]_PREDICATES[0]=Path=/answers/**
       - SPRING_CLOUD_LOADBALANCER_RIBBON_ENABLED=false
       - SPRING_CLOUD_GATEWAY_GLOBALCORS_CORS_CONFIGURATIONS_[/**]_ALLOWED_ORIGIN_PATTERNS=*
       - SPRING_CLOUD_GATEWAY_GLOBALCORS_CORS_CONFIGURATIONS_[/**]_ALLOWED_METHODS=GET,POST,PUT,DELETE,PATCH,OPTIONS,HEAD
@@ -281,48 +227,9 @@ services:
         condition: service_started
       exam-service:
         condition: service_started
-      answer-service:
-        condition: service_started
     networks:
       - microservices-net
 
-
-  zuul-service:
-    build:
-      context: ./backend
-      dockerfile: zuul-service/Dockerfile
-    container_name: zuul-service
-    restart: unless-stopped
-    mem_limit: 256m
-    ports:
-      - "18091:8091"
-    environment:
-      - SPRING_APPLICATION_NAME=zuul-service
-      - SERVER_PORT=8091
-      - JAVA_TOOL_OPTIONS=-Xms32m -Xmx128m
-      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-service:8761/eureka
-      - EUREKA_INSTANCE_PREFER_IP_ADDRESS=true
-      - ZUUL_ROUTES_USER-SERVICE_PATH=/api/students/**
-      - ZUUL_ROUTES_USER-SERVICE_SERVICEID=user-service
-      - ZUUL_ROUTES_COURSE-SERVICE_PATH=/api/courses/**
-      - ZUUL_ROUTES_COURSE-SERVICE_SERVICEID=course-service
-      - ZUUL_ROUTES_EXAM-SERVICE_PATH=/api/exams/**
-      - ZUUL_ROUTES_EXAM-SERVICE_SERVICEID=exam-service
-      - ZUUL_ROUTES_ANSWER-SERVICE_PATH=/api/answers/**
-      - ZUUL_ROUTES_ANSWER-SERVICE_SERVICEID=answer-service
-    depends_on:
-      eureka-service:
-        condition: service_healthy
-      user-service:
-        condition: service_started
-      course-service:
-        condition: service_started
-      exam-service:
-        condition: service_started
-      answer-service:
-        condition: service_started
-    networks:
-      - microservices-net
 
 
   frontend:
