@@ -42,3 +42,31 @@ scrape_configs:
     metrics_path: '/actuator/prometheus'
     static_configs:
       - targets: ['192.168.56.11:18090']
+
+  # ── Databases ──────────────────────────────────────────────────────────────
+  # These use exporters that must be running alongside the DB containers.
+  # Add the following exporters to docker-compose if not already present:
+  #   - prom/postgres-exporter  (exposes :9187)
+  #   - prom/mysqld-exporter    (exposes :9104)
+  #   - percona/mongodb_exporter (exposes :9216)
+
+  - job_name: 'postgres'
+    static_configs:
+      - targets: ['192.168.56.11:9187']
+
+  - job_name: 'mysql'
+    static_configs:
+      - targets: ['192.168.56.11:9104']
+
+  - job_name: 'mongodb'
+    static_configs:
+      - targets: ['192.168.56.11:9216']
+
+  # ── Frontend (nginx) ───────────────────────────────────────────────────────
+  # nginx-prometheus-exporter exposes nginx stub_status metrics on :9113
+  # Add nginx-prometheus-exporter to docker-compose if not already present.
+
+  - job_name: 'frontend-nginx'
+    static_configs:
+      - targets: ['192.168.56.11:9113']
+

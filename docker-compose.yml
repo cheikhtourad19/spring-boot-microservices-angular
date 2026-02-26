@@ -320,3 +320,63 @@ services:
     networks:
       - microservices-net
 
+
+  # ─── Prometheus Exporters ────────────────────────────────────────────────
+
+  postgres-exporter:
+    image: prometheuscommunity/postgres-exporter:v0.15.0
+    container_name: postgres-exporter
+    restart: unless-stopped
+    ports:
+      - "9187:9187"
+    environment:
+      - DATA_SOURCE_NAME=postgresql://postgres:changeme@postgres:5432/microservices_users?sslmode=disable
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - microservices-net
+
+  mysql-exporter:
+    image: prom/mysqld-exporter:v0.15.1
+    container_name: mysql-exporter
+    restart: unless-stopped
+    ports:
+      - "9104:9104"
+    environment:
+      - DATA_SOURCE_NAME=root:password@(mysql:3306)/
+    depends_on:
+      mysql:
+        condition: service_healthy
+    networks:
+      - microservices-net
+
+  mongodb-exporter:
+    image: percona/mongodb_exporter:0.40
+    container_name: mongodb-exporter
+    restart: unless-stopped
+    ports:
+      - "9216:9216"
+    command:
+      - '--mongodb.uri=mongodb://mongodb:mongodb@mongodb:27017/admin'
+      - '--collect-all'
+    depends_on:
+      mongodb:
+        condition: service_healthy
+    networks:
+      - microservices-net
+
+  nginx-exporter:
+    image: nginx/nginx-prometheus-exporter:1.1.0
+    container_name: nginx-exporter
+    restart: unless-stopped
+    ports:
+      - "9113:9113"
+    command:
+      - '-nginx.scrape-uri=http://frontend:80/stub_status'
+    depends_on:
+      - frontend
+    networks:
+      - microservices-net
+
+
