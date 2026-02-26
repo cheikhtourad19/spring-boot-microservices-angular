@@ -70,7 +70,7 @@ services:
     networks:
       - microservices-net
     healthcheck:
-      test: ["CMD-SHELL", "mongosh --quiet --eval \"db.adminCommand('ping').ok\" || mongo --quiet --eval \"db.adminCommand('ping').ok\""]
+      test: ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping')", "--username", "mongodb", "--password", "mongodb", "--authenticationDatabase", "admin"]
       interval: 15s
       timeout: 10s
       retries: 10
