@@ -14,6 +14,7 @@ services:
     image: postgres:15-alpine
     container_name: postgres
     restart: unless-stopped
+    mem_limit: 256m
     environment:
       POSTGRES_DB: microservices_users
       POSTGRES_USER: postgres
@@ -34,9 +35,11 @@ services:
     image: mysql:8.0
     container_name: mysql
     restart: unless-stopped
+    mem_limit: 300m
     environment:
       MYSQL_ROOT_PASSWORD: password
       MYSQL_DATABASE: microservices_db
+      MYSQL_INNODB_BUFFER_POOL_SIZE: "67108864"
     ports:
       - "3306:3306"
     volumes:
@@ -54,6 +57,8 @@ services:
     image: mongo:6.0
     container_name: mongodb
     restart: unless-stopped
+    mem_limit: 256m
+    command: ["mongod", "--wiredTigerCacheSizeGB", "0.1"]
     environment:
       MONGO_INITDB_ROOT_USERNAME: mongodb
       MONGO_INITDB_ROOT_PASSWORD: mongodb
@@ -77,6 +82,7 @@ services:
       dockerfile: eureka-service/Dockerfile
     container_name: eureka-service
     restart: unless-stopped
+    mem_limit: 256m
     ports:
       - "18761:8761"
     environment:
@@ -84,6 +90,7 @@ services:
       - SERVER_PORT=8761
       - EUREKA_CLIENT_REGISTER_WITH_EUREKA=false
       - EUREKA_CLIENT_FETCH_REGISTRY=false
+      - JAVA_TOOL_OPTIONS=-Xms32m -Xmx128m
       - MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE=health,info,prometheus,metrics
       - MANAGEMENT_ENDPOINT_HEALTH_SHOW_DETAILS=always
       - MANAGEMENT_METRICS_TAGS_APPLICATION=eureka-service
@@ -103,11 +110,13 @@ services:
       dockerfile: user-service/Dockerfile
     container_name: user-service
     restart: unless-stopped
+    mem_limit: 256m
     ports:
       - "18080:8080"
     environment:
       - SPRING_APPLICATION_NAME=user-service
       - SERVER_PORT=8080
+      - JAVA_TOOL_OPTIONS=-Xms32m -Xmx128m
       - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-service:8761/eureka
       - EUREKA_INSTANCE_PREFER_IP_ADDRESS=true
       - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/microservices_users
@@ -135,11 +144,13 @@ services:
       dockerfile: course-service/Dockerfile
     container_name: course-service
     restart: unless-stopped
+    mem_limit: 256m
     ports:
       - "18081:8081"
     environment:
       - SPRING_APPLICATION_NAME=course-service
       - SERVER_PORT=8081
+      - JAVA_TOOL_OPTIONS=-Xms32m -Xmx128m
       - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-service:8761/eureka
       - EUREKA_INSTANCE_PREFER_IP_ADDRESS=true
       - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/microservices_db
@@ -166,11 +177,13 @@ services:
       dockerfile: exam-service/Dockerfile
     container_name: exam-service
     restart: unless-stopped
+    mem_limit: 256m
     ports:
       - "18082:8082"
     environment:
       - SPRING_APPLICATION_NAME=exam-service
       - SERVER_PORT=8082
+      - JAVA_TOOL_OPTIONS=-Xms32m -Xmx128m
       - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-service:8761/eureka
       - EUREKA_INSTANCE_PREFER_IP_ADDRESS=true
       - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/microservices_db
@@ -197,11 +210,13 @@ services:
       dockerfile: answer-service/Dockerfile
     container_name: answer-service
     restart: unless-stopped
+    mem_limit: 256m
     ports:
       - "18083:8083"
     environment:
       - SPRING_APPLICATION_NAME=answer-service
       - SERVER_PORT=8083
+      - JAVA_TOOL_OPTIONS=-Xms32m -Xmx128m
       - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-service:8761/eureka
       - EUREKA_INSTANCE_PREFER_IP_ADDRESS=true
       - SPRING_DATA_MONGODB_URI=mongodb://mongodb:mongodb@mongodb:27017/microservices_answers_db?authSource=admin
@@ -225,11 +240,13 @@ services:
       dockerfile: api-gateway-service/Dockerfile
     container_name: api-gateway
     restart: unless-stopped
+    mem_limit: 256m
     ports:
       - "18090:8090"
     environment:
       - SPRING_APPLICATION_NAME=api-gateway-service
       - SERVER_PORT=8090
+      - JAVA_TOOL_OPTIONS=-Xms32m -Xmx128m
       - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-service:8761/eureka
       - EUREKA_INSTANCE_PREFER_IP_ADDRESS=true
       - SPRING_CLOUD_GATEWAY_DISCOVERY_LOCATOR_ENABLED=true
@@ -277,11 +294,13 @@ services:
       dockerfile: zuul-service/Dockerfile
     container_name: zuul-service
     restart: unless-stopped
+    mem_limit: 256m
     ports:
-      - "18091:8090"
+      - "18091:8091"
     environment:
       - SPRING_APPLICATION_NAME=zuul-service
-      - SERVER_PORT=8090
+      - SERVER_PORT=8091
+      - JAVA_TOOL_OPTIONS=-Xms32m -Xmx128m
       - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-service:8761/eureka
       - EUREKA_INSTANCE_PREFER_IP_ADDRESS=true
       - ZUUL_ROUTES_USER-SERVICE_PATH=/api/students/**
@@ -313,70 +332,11 @@ services:
       dockerfile: Dockerfile
     container_name: frontend
     restart: unless-stopped
+    mem_limit: 64m
     ports:
       - "4200:80"
     depends_on:
       - api-gateway
     networks:
       - microservices-net
-
-
-  # ─── Prometheus Exporters ────────────────────────────────────────────────
-
-  postgres-exporter:
-    image: prometheuscommunity/postgres-exporter:v0.15.0
-    container_name: postgres-exporter
-    restart: unless-stopped
-    ports:
-      - "9187:9187"
-    environment:
-      - DATA_SOURCE_NAME=postgresql://postgres:changeme@postgres:5432/microservices_users?sslmode=disable
-    depends_on:
-      postgres:
-        condition: service_healthy
-    networks:
-      - microservices-net
-
-  mysql-exporter:
-    image: prom/mysqld-exporter:v0.15.1
-    container_name: mysql-exporter
-    restart: unless-stopped
-    ports:
-      - "9104:9104"
-    environment:
-      - DATA_SOURCE_NAME=root:password@(mysql:3306)/
-    depends_on:
-      mysql:
-        condition: service_healthy
-    networks:
-      - microservices-net
-
-  mongodb-exporter:
-    image: percona/mongodb_exporter:0.40
-    container_name: mongodb-exporter
-    restart: unless-stopped
-    ports:
-      - "9216:9216"
-    command:
-      - '--mongodb.uri=mongodb://mongodb:mongodb@mongodb:27017/admin'
-      - '--collect-all'
-    depends_on:
-      mongodb:
-        condition: service_healthy
-    networks:
-      - microservices-net
-
-  nginx-exporter:
-    image: nginx/nginx-prometheus-exporter:1.1.0
-    container_name: nginx-exporter
-    restart: unless-stopped
-    ports:
-      - "9113:9113"
-    command:
-      - '-nginx.scrape-uri=http://frontend:80/stub_status'
-    depends_on:
-      - frontend
-    networks:
-      - microservices-net
-
 
