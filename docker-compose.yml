@@ -84,6 +84,9 @@ services:
       - SERVER_PORT=8761
       - EUREKA_CLIENT_REGISTER_WITH_EUREKA=false
       - EUREKA_CLIENT_FETCH_REGISTRY=false
+      - MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE=health,info,prometheus,metrics
+      - MANAGEMENT_ENDPOINT_HEALTH_SHOW_DETAILS=always
+      - MANAGEMENT_METRICS_TAGS_APPLICATION=eureka-service
     networks:
       - microservices-net
     healthcheck:
@@ -114,6 +117,9 @@ services:
       - SPRING_JPA_HIBERNATE_DDL_AUTO=update
       - SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT=org.hibernate.dialect.PostgreSQLDialect
       - SPRING_CLOUD_LOADBALANCER_RIBBON_ENABLED=false
+      - MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE=health,info,prometheus,metrics
+      - MANAGEMENT_ENDPOINT_HEALTH_SHOW_DETAILS=always
+      - MANAGEMENT_METRICS_TAGS_APPLICATION=user-service
     depends_on:
       postgres:
         condition: service_healthy
@@ -142,6 +148,9 @@ services:
       - SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT=org.hibernate.dialect.MySQL8Dialect
       - SPRING_JPA_HIBERNATE_DDL_AUTO=update
       - SPRING_CLOUD_LOADBALANCER_RIBBON_ENABLED=false
+      - MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE=health,info,prometheus,metrics
+      - MANAGEMENT_ENDPOINT_HEALTH_SHOW_DETAILS=always
+      - MANAGEMENT_METRICS_TAGS_APPLICATION=course-service
     depends_on:
       mysql:
         condition: service_healthy
@@ -170,6 +179,9 @@ services:
       - SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT=org.hibernate.dialect.MySQL8Dialect
       - SPRING_JPA_HIBERNATE_DDL_AUTO=update
       - SPRING_CLOUD_LOADBALANCER_RIBBON_ENABLED=false
+      - MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE=health,info,prometheus,metrics
+      - MANAGEMENT_ENDPOINT_HEALTH_SHOW_DETAILS=always
+      - MANAGEMENT_METRICS_TAGS_APPLICATION=exam-service
     depends_on:
       mysql:
         condition: service_healthy
@@ -195,6 +207,9 @@ services:
       - SPRING_DATA_MONGODB_URI=mongodb://mongodb:mongodb@mongodb:27017/microservices_answers_db?authSource=admin
       - SPRING_AUTOCONFIGURE_EXCLUDE=org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
       - SPRING_CLOUD_LOADBALANCER_RIBBON_ENABLED=false
+      - MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE=health,info,prometheus,metrics
+      - MANAGEMENT_ENDPOINT_HEALTH_SHOW_DETAILS=always
+      - MANAGEMENT_METRICS_TAGS_APPLICATION=answer-service
     depends_on:
       mongodb:
         condition: service_healthy
@@ -238,6 +253,9 @@ services:
       - SPRING_CLOUD_GATEWAY_GLOBALCORS_CORS_CONFIGURATIONS_[/**]_ALLOW_CREDENTIALS=true
       - SPRING_CLOUD_GATEWAY_GLOBALCORS_CORS_CONFIGURATIONS_[/**]_MAX_AGE=3600
       - SPRING_CLOUD_GATEWAY_DEFAULT_FILTERS[0]=DedupeResponseHeader=Access-Control-Allow-Credentials Access-Control-Allow-Origin
+      - MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE=health,info,prometheus,metrics
+      - MANAGEMENT_ENDPOINT_HEALTH_SHOW_DETAILS=always
+      - MANAGEMENT_METRICS_TAGS_APPLICATION=api-gateway-service
     depends_on:
       eureka-service:
         condition: service_healthy
@@ -301,3 +319,4 @@ services:
       - api-gateway
     networks:
       - microservices-net
+

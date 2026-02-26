@@ -78,6 +78,20 @@
         </dependencies>
     </dependencyManagement>
 
+    <!-- ===== Shared dependencies inherited by every child module ===== -->
+    <dependencies>
+        <!-- Actuator: exposes /actuator/health, /actuator/metrics, etc. -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
+        </dependency>
+        <!-- Micrometer Prometheus registry: exposes /actuator/prometheus -->
+        <dependency>
+            <groupId>io.micrometer</groupId>
+            <artifactId>micrometer-registry-prometheus</artifactId>
+        </dependency>
+    </dependencies>
+
     <!-- ===== Build: plugins available to all children ===== -->
     <build>
         <pluginManagement>

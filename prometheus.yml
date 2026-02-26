@@ -1,0 +1,44 @@
+global:
+  scrape_interval: 15s       # How often to scrape targets
+  evaluation_interval: 15s   # How often to evaluate rules
+
+scrape_configs:
+
+  # Prometheus scrapes itself
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+
+  # ── Microservices ──────────────────────────────────────────────────────────
+  # Prometheus runs standalone on the VM, outside the docker-compose network.
+  # It reaches the services via the host-mapped ports on the VM IP.
+
+  - job_name: 'eureka-service'
+    metrics_path: '/actuator/prometheus'
+    static_configs:
+      - targets: ['192.168.56.11:18761']
+
+  - job_name: 'user-service'
+    metrics_path: '/actuator/prometheus'
+    static_configs:
+      - targets: ['192.168.56.11:18080']
+
+  - job_name: 'course-service'
+    metrics_path: '/actuator/prometheus'
+    static_configs:
+      - targets: ['192.168.56.11:18081']
+
+  - job_name: 'exam-service'
+    metrics_path: '/actuator/prometheus'
+    static_configs:
+      - targets: ['192.168.56.11:18082']
+
+  - job_name: 'answer-service'
+    metrics_path: '/actuator/prometheus'
+    static_configs:
+      - targets: ['192.168.56.11:18083']
+
+  - job_name: 'api-gateway-service'
+    metrics_path: '/actuator/prometheus'
+    static_configs:
+      - targets: ['192.168.56.11:18090']
