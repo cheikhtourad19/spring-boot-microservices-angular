@@ -70,10 +70,11 @@ services:
     networks:
       - microservices-net
     healthcheck:
-      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
+      test: ["CMD-SHELL", "mongosh --quiet --eval \"db.adminCommand('ping').ok\" || mongo --quiet --eval \"db.adminCommand('ping').ok\""]
+      interval: 15s
+      timeout: 10s
+      retries: 10
+      start_period: 40s
 
 
   eureka-service:
@@ -232,8 +233,6 @@ services:
         condition: service_healthy
     networks:
       - microservices-net
-
-
   api-gateway:
     build:
       context: ./backend
@@ -275,7 +274,7 @@ services:
       - MANAGEMENT_METRICS_TAGS_APPLICATION=api-gateway-service
     depends_on:
       eureka-service:
-        condition: service_healthy
+        condition: service_started
       user-service:
         condition: service_started
       course-service:

@@ -1,6 +1,6 @@
 
 server:
-  port: 8090
+  port: 8091
 spring:
   application:
     name: zuul-service
@@ -14,17 +14,26 @@ zuul:
   routes:
     user-service:
       path: /api/students/**
-      url: http://localhost:8080/students/
       serviceId: user-service
     course-service:
       path: /api/courses/**
-      url: http://localhost:8081/courses/
       serviceId: course-service
     exam-service:
       path: /api/exams/**
-      url: http://localhost:8082/exams/
       serviceId: exam-service
     answer-service:
       path: /api/answers/**
-      url: http://localhost:8083/answers/
       serviceId: answer-service
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,prometheus,metrics
+  endpoint:
+    health:
+      show-details: always
+  metrics:
+    tags:
+      application: ${spring.application.name}
+
